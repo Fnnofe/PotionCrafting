@@ -4,22 +4,19 @@ using UnityEngine;
 
 public class PotionSystem : MonoBehaviour
 {
-    bool divine,neutral,deadly;
-    bool isThrowable;
+    public bool divine,neutral,deadly=false;
+    public bool isThrowable = false;
+    public bool isFull = false;
 
-    Material material;
-    ParticleSystem potionSmoke;
+    public MeshRenderer meshRenderer;
+    public ParticleSystem potionSmoke;
 
+    private void Start()
+    {
+        potionSmoke.Stop();
+
+
+    }
 
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
