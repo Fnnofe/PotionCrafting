@@ -10,9 +10,13 @@ public class PotionSystem : MonoBehaviour
 
     public MeshRenderer meshRenderer;
     public ParticleSystem potionSmoke;
+    public Transform currentPostion;
 
     private void Start()
     {
+         currentPostion = gameObject.transform;
+
+
         potionSmoke.Stop();
 
 

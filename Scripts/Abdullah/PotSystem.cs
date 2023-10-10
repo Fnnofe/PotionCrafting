@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine;
 
 public class PotSystem : MonoBehaviour
@@ -11,12 +10,14 @@ public class PotSystem : MonoBehaviour
     [SerializeField] int potCapacity;
     [SerializeField] Material material;
     [SerializeField] ParticleSystem smoke;
-    GameObject potion;
+    [SerializeField] GameObject potion;
     int isBuff, isDebuff, isHeal, isDamage, isStatesUp, isStatesDown;
     int[] materialColor= new int[6];
     Color colorLerp= new Color(1f,1f,1f,0.25f);
     int resetPot;
-
+    [SerializeField] ParticleSystem explodeParticle;
+    public Animator testerControler;
+    PotionSystem potionSystem;
 
     // Start is called before the first frame update
     void Start()
@@ -24,10 +25,20 @@ public class PotSystem : MonoBehaviour
         Debug.Log("Start");
         material.color = colorLerp;
         resetPot = potCapacity;
+        smoke.Stop();
+        potionSystem = potion.GetComponent<PotionSystem>();
+
     }
 
     void Update()
     {
+        if (potCapacity < 0)
+        {
+            ResetPot();
+
+
+        }
+
 
     }
 
@@ -39,8 +50,8 @@ public class PotSystem : MonoBehaviour
 
     public void OnTriggerStay(Collider trigger)
     {
-        
-        if (Input.GetKeyUp(KeyCode.Mouse0) && trigger.gameObject.tag=="Player")
+        smoke.Play();
+        if ( trigger.gameObject.tag== "Ingredient")
         {
             Debug.Log(trigger.gameObject.name);
             trigger.gameObject.SetActive(false);
@@ -103,6 +114,7 @@ public class PotSystem : MonoBehaviour
 
                 PotColor(i);
                 SmokeColor(currentSubColor);
+
             }
 
         }
@@ -122,6 +134,7 @@ public class PotSystem : MonoBehaviour
         {
             colorLerp = Color.Lerp(material.color, Color.yellow, 1);
             Debug.Log("BUFF");
+            testerControler.SetInteger("PotionState", 0);
 
         }
         //debuff
@@ -129,6 +142,7 @@ public class PotSystem : MonoBehaviour
         {
             colorLerp = Color.Lerp(material.color, Color.blue, 1);
             Debug.Log("DEBUFF");
+            testerControler.SetInteger("PotionState", 1);
 
         }
         //heal
@@ -136,6 +150,7 @@ public class PotSystem : MonoBehaviour
         {
             colorLerp = Color.Lerp(material.color, Color.red, 1);
             Debug.Log("HEALING");
+            testerControler.SetInteger("PotionState", 2);
 
         }
         //damage
@@ -143,6 +158,7 @@ public class PotSystem : MonoBehaviour
         {
             colorLerp = Color.Lerp(material.color, Color.black, 1);
             Debug.Log("POISION");
+            testerControler.SetInteger("PotionState", 3);
 
         }
         //state up
@@ -150,6 +166,7 @@ public class PotSystem : MonoBehaviour
         {
             colorLerp = Color.Lerp(material.color, Color.white, 1);
             Debug.Log("STATES UP");
+            testerControler.SetInteger("PotionState", 4);
 
         }
         //state down
@@ -157,6 +174,7 @@ public class PotSystem : MonoBehaviour
         {
             colorLerp = Color.Lerp(material.color, Color.gray, 1);
             Debug.Log("STATES DOWN");
+            testerControler.SetInteger("PotionState", 5);
 
         }
 
@@ -216,35 +234,75 @@ public class PotSystem : MonoBehaviour
 
     }
 
-    void PotExplode()
+    public void ResetPotion()
     {
+        potionSystem.meshRenderer.material.color = colorLerp;
+        potionSystem.potionSmoke.startColor = smoke.startColor;
+        potionSystem.potionSmoke.Stop();
+        potionSystem.isFull = false;
+
+
 
     }
-    void ResetPot()
+    void PotExplode()
+    {
+        smoke.Stop();
+        explodeParticle.Play();
+
+        colorLerp = new Color(1f, 1f, 1f, 0);
+
+        isBuff = 0;
+        isDebuff = 0;
+        isHeal = 0;
+        isDamage = 0;
+        isStatesUp =0;
+        isStatesDown =0;
+
+        testerControler.SetInteger("PotionState",-1);
+        testerControler.SetTrigger("isExploded");
+        testerControler.gameObject.GetComponent<Collider>().enabled = false;
+        ResetPot();
+
+    }
+    public void ResetPot()
     {
         //load scene
         potCapacity = resetPot;
+        colorLerp = new Color(1f, 1f, 1f, 0.25f);
+        isBuff = 0;
+        isDebuff = 0;
+        isHeal = 0;
+        isDamage = 0;
+        isStatesUp = 0;
+        isStatesDown = 0;
+        gameObject.GetComponent<Collider>().enabled = true;
 
 
     }
-    void CraftPotion(GameObject potion)
+
+    public void CraftPotion(GameObject potion)
     {
-        PotionSystem potionSystem = potion.GetComponent<PotionSystem>();
+        testerControler.gameObject.GetComponent<Collider>().enabled = true;
+
         potionSystem.meshRenderer.material.color = colorLerp;
         potionSystem.potionSmoke.startColor = smoke.startColor;
         potionSystem.isFull = true;
 
+
+
         Debug.Log(potionSystem.meshRenderer.material.color = colorLerp);
-
-
         potionSystem.potionSmoke.Play();
 
 
 
+
+        gameObject.GetComponent<Collider>().enabled = false;
+
       colorLerp = new Color(1f, 1f, 1f, 0.25f);
+
         smoke.Stop();
 
-
+    
 
     }
 

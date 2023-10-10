@@ -10,6 +10,8 @@ public class IngredientTemplet : MonoBehaviour
     void Update()
     {
         
+
+
     }
 
 
